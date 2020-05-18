@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandelbrot</title>
+    <style>
+        body, html{
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        #loadingScreenBackground{
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #loadingScreenBackground > div {
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
+            font-weight: bold;
+            padding: 50px 30px;
+            background: black;
+            border: 3px solid white;
+            width: 200px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingScreenBackground">
+        <div>
+            Rendering...
+        </div>
+    </div>
+</body>
+</html>
