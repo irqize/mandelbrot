@@ -6,6 +6,11 @@
         "module": "ES2015",
         "target": "es5",
         "allowJs": true,
+        "lib": [
+            "webworker",
+            "es6",
+            "DOM"
+        ]
     },
     "include": [
         "src/**/*"

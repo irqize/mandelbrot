@@ -1,8 +1,10 @@
 import * as dat from 'dat.gui';
+import RenderWorker from "worker-loader?name=dist/[name].js!./RenderWorker";
+
 const scrollInRatio = .90;
 const scrollOutRatio = 1.1
 
-interface MousePos{
+interface MousePos {
     x: number,
     y: number
 }
@@ -17,25 +19,25 @@ export class Mandelbrot {
         yFrom: number,
         yTo: number
     } = {
-        xFrom: -2,
-        xTo: 1,
-        yFrom: -1,
-        yTo: 1
-    };
+            xFrom: -2,
+            xTo: 1,
+            yFrom: -1,
+            yTo: 1
+        };
 
-    mousePos: MousePos  = {
+    mousePos: MousePos = {
         x: 0,
         y: 0
     };
 
-    wheelTimeoutId : number = 0;
+    wheelTimeoutId: number = 0;
 
-    iterations: number = 1000;
+    iterations: number = 5000;
 
     isDragging: boolean = false;
     draggedFromPos: MousePos = {
-        x : 0,
-        y : 0
+        x: 0,
+        y: 0
     };
 
     constructor(canvas: HTMLCanvasElement, loadingScreeen: HTMLElement) {
@@ -45,7 +47,7 @@ export class Mandelbrot {
         this.initEventHandlers();
 
         const gui: dat.GUI = new dat.GUI();
-        gui.add(this, 'iterations', 0, 10000)
+        gui.add(this, 'iterations', 0, 20000)
 
     }
 
@@ -61,16 +63,16 @@ export class Mandelbrot {
     }
 
 
-    initEventHandlers() {
+    private initEventHandlers() {
         this.canvas.onmousemove = (event: MouseEvent) => {
             this.mousePos.x = event.offsetX;
             this.mousePos.y = event.offsetY;
         }
 
         this.canvas.onwheel = (event: WheelEvent) => {
-            if(event.deltaY < 0){
+            if (event.deltaY < 0) {
                 this.scrollUp();
-            }else{
+            } else {
                 this.scrollDown();
             }
         }
@@ -82,9 +84,9 @@ export class Mandelbrot {
         }
 
         this.canvas.onmouseup = (event: MouseEvent) => {
-            if(!this.isDragging) return;
+            if (!this.isDragging) return;
 
-            this.drag((event.offsetX - this.draggedFromPos.x)/window.innerWidth, (event.offsetY - this.draggedFromPos.y)/window.innerHeight);
+            this.drag((event.offsetX - this.draggedFromPos.x) / window.innerWidth, (event.offsetY - this.draggedFromPos.y) / window.innerHeight);
         }
 
         this.canvas.onmouseleave = (_) => {
@@ -92,7 +94,7 @@ export class Mandelbrot {
         }
     }
 
-    drag(deltaX: number, deltaY: number){
+    private drag(deltaX: number, deltaY: number) {
         const width: number = this.cords.xTo - this.cords.xFrom;
         const height: number = this.cords.yTo - this.cords.yFrom;
 
@@ -102,12 +104,10 @@ export class Mandelbrot {
         this.cords.yFrom -= height * deltaY;
         this.cords.yTo -= height * deltaY;
 
-        console.log(this.cords);
-
         this.render();
     }
 
-    scrollUp(){
+    private scrollUp() {
         const oldWidth: number = this.cords.xTo - this.cords.xFrom;
         const newWidth: number = (this.cords.xTo - this.cords.xFrom) * scrollInRatio;
 
@@ -121,25 +121,24 @@ export class Mandelbrot {
         const oldHeight: number = this.cords.yTo - this.cords.yFrom;
         const newHeight: number = (this.cords.xTo - this.cords.xFrom) * ratio;
 
-        const mouseYPos = this.mousePos.y  / this.canvas.height;
+        const mouseYPos = this.mousePos.y / this.canvas.height;
 
         this.cords.yFrom -= (newHeight - oldHeight) * mouseYPos;
         this.cords.yTo += (newHeight - oldHeight) * (1 - mouseYPos);
 
-        
 
-        if(this.wheelTimeoutId){
+
+        if (this.wheelTimeoutId) {
             clearTimeout(this.wheelTimeoutId);
         }
 
         this.wheelTimeoutId = window.setTimeout(() => {
-            console.log(this.cords);
             this.render();
             this.wheelTimeoutId = 0;
         }, 300);
     }
 
-    scrollDown(){
+    private scrollDown() {
         const oldWidth: number = this.cords.xTo - this.cords.xFrom;
         const newWidth: number = (this.cords.xTo - this.cords.xFrom) * scrollOutRatio;
 
@@ -152,7 +151,7 @@ export class Mandelbrot {
 
         this.render();
 
-        if(this.wheelTimeoutId){
+        if (this.wheelTimeoutId) {
             clearTimeout(this.wheelTimeoutId);
         }
 
@@ -164,85 +163,61 @@ export class Mandelbrot {
 
 
     resize(width: number, height: number) {
-        
-        console.log(this.loadingScreen);
         this.canvas.width = width;
         this.canvas.height = height;
         this.applyAspectRatio();
         this.render();
-        
+
     }
 
     render() {
         this.loadingScreen.style.display = 'flex';
-        console.log('Started rendering..') 
-        //Timeout to let dom update and show the loading screen
-        setTimeout(()=>{
-            const width: number = this.canvas.width;
-            const height: number = this.canvas.height;
-    
-            const ctx : CanvasRenderingContext2D = this.canvas.getContext('2d');
-            const imageData : ImageData = ctx.getImageData(0, 0, width, height);
-            const imageDataArray : Uint8ClampedArray = imageData.data;
-    
-            for (let ix = 0; ix < width; ++ix) {
-                for (let iy = 0; iy < height; ++iy) {
-                    const x = this.cords.xFrom + (this.cords.xTo - this.cords.xFrom) * ix / (width - 1);
-                    const y = this.cords.yFrom + (this.cords.yTo - this.cords.yFrom) * iy / (height - 1);
-                    const i = this.mandelbrotIteration(x, y);
-                    const arrayPos = 4 * (width * iy + ix);
-    
-                    if (i > this.iterations) {
-                        imageDataArray[arrayPos] = 0;
-                        imageDataArray[arrayPos + 1] = 0;
-                        imageDataArray[arrayPos + 2] = 0;
-                    } else {
-                        var c = 3 * Math.log(i) / Math.log(this.iterations - 1.0);
-    
-                        if (c < 1) {
-                            imageDataArray[arrayPos] = 255 * c;
-                            imageDataArray[arrayPos + 1] = 0;
-                            imageDataArray[arrayPos + 2] = 0;
-                        }
-                        else if (c < 2) {
-                            imageDataArray[arrayPos] = 255;
-                            imageDataArray[arrayPos + 1] = 255 * (c - 1);
-                            imageDataArray[arrayPos + 2] = 0;
-                        } else {
-                            imageDataArray[arrayPos] = 255;
-                            imageDataArray[arrayPos + 1] = 255;
-                            imageDataArray[arrayPos + 2] = 255 * (c - 2);
-                        }
-                    }
-                    imageDataArray[arrayPos + 3] = 255;
+        console.log('Started rendering..')
+
+        const width: number = this.canvas.width;
+        const height: number = this.canvas.height;
+
+        const ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');
+        const imageData: ImageData = ctx.getImageData(0, 0, width, height);
+        const imageDataArray: Uint8ClampedArray = imageData.data;
+
+        const workersNumber: number = window.navigator.hardwareConcurrency;
+        let doneWorkers = 0;
+
+        let startY: number = 0, endY: number = 0;
+
+
+        for (let i = 0; i < workersNumber; i++) {
+            const worker = new RenderWorker();
+
+            startY = endY;
+            endY = startY + Math.floor(height / workersNumber);
+            if (i + 1 == workersNumber) endY = height + 1;
+
+            worker.postMessage({
+                cords: this.cords,
+                startY,
+                endY,
+                width,
+                height,
+                iterations: this.iterations
+            });
+            let arrayBasePos: number = startY * width * 4;
+
+            worker.onmessage = (event) => {
+                doneWorkers++;
+
+                for (let i = 0; i < event.data.length; i++) {
+                    imageDataArray[arrayBasePos + i] = event.data[i];
                 }
-                
-            }
-            
-            ctx.putImageData(imageData, 0, 0);
-            console.log('Rendering finished..');
-            this.loadingScreen.style.display = 'none';
-        }, 500);
-        
-        
-    }
+                worker.terminate();
 
-    private mandelbrotIteration(cx: number, cy: number): number{
-            let x = 0.0;
-            let y = 0.0;
-            let xx = 0;
-            let yy = 0;
-            let xy = 0;
-           
-            let i = this.iterations;
-            while (i-- && (4 >= xx + yy)){
-              xy = x * y;
-              xx = x * x;
-              yy = y * y;
-              x = xx - yy + cx;
-              y = xy + xy + cy;
+                if (doneWorkers == workersNumber) {
+                    ctx.putImageData(imageData, 0, 0);
+                    console.log('Rendering finished..');
+                    this.loadingScreen.style.display = 'none';
+                }
             }
-            return this.iterations - i;
+        }
     }
-
 }
