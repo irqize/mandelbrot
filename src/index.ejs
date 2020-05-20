@@ -22,6 +22,7 @@
             justify-content: center;
             align-items: center;
             cursor: default;
+            z-index: 10;
         }
         #loadingScreenBackground > div {
             font-family: Arial, Helvetica, sans-serif;
@@ -33,13 +34,88 @@
             width: 200px;
             text-align: center;
         }
+
+        #welcomeMessageBackground{
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: default;
+            z-index: 20;
+        }
+        #welcomeMessageBackground > div{
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
+            font-weight: bold;
+            padding: 5px 15px;
+            background: black;
+            border: 3px solid white;
+            text-align: center;
+        }
+        #welcomeMessageBackground > div > p{
+            font-weight: lighter;
+            text-align: justify;
+            width: 400px;
+        }
+        #welcomeMessageBackground > div > button{
+            padding: 10px 15px;
+            background: black;
+            border: 3px solid white;
+            color: white;
+            margin: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #github-link{
+            position: fixed;
+            bottom: 0;
+            left: 30px;
+            border-bottom: none;
+            background: white;
+            width: 32px;
+            height: 32px;
+            text-align: center;
+        }
+        #github-link > img{
+            width: 28px;
+            height: 28px;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
+    <a href="https://github.com/irqize/mandelbrot"><div id="github-link">
+        <img src="https://raw.githubusercontent.com/rdimascio/icons/master/icons/github.svg" />
+    </div></a>
+    <div id="welcomeMessageBackground">
+        <div>
+            <h2>
+                Mandelbrot Set Visualisation
+            </h2>
+            <p>
+                App generates visual representation of the Mandelbrot Set. It uses escape time algorithm to generate value for each pixel. It's implemented in vanilla Javascript and uses WebWorkers for multithreading. If rendering images takes very long time consider lowering the resolution of the window or number of iterations (can be changed with slider in the top right corner). Source code can be found on my <a href="https://github.com/irqize/mandelbrot">GitHub</a>. After zooming in a lot image may become pixelated as Javascript's floating point numbers' precision may be not enough to perform exact calculations anymore. Have fun!
+            </p>
+            <h3>Controls</h3>
+            <p>
+                Scroll to zoom in and out.
+                Drag the screen to move horizontally and vertically.
+            </p>
+        <button onclick="document.getElementById('welcomeMessageBackground').remove();">
+                Start
+            </button>
+        </div>
+    </div>
     <div id="loadingScreenBackground">
         <div>
             Rendering...
         </div>
     </div>
+    
+    
 </body>
 </html>
