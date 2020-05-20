@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandelbrot</title>
-    <style>
-        body, html{
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mandelbrot</title><style>body, html{
             height: 100%;
             padding: 0;
             margin: 0;
@@ -85,37 +78,4 @@
             width: 28px;
             height: 28px;
             margin-top: 2px;
-        }
-    </style>
-</head>
-<body>
-    <a href="https://github.com/irqize/mandelbrot"><div id="github-link">
-        <img src="https://raw.githubusercontent.com/rdimascio/icons/master/icons/github.svg" />
-    </div></a>
-    <div id="welcomeMessageBackground">
-        <div>
-            <h2>
-                Mandelbrot Set Visualisation
-            </h2>
-            <p>
-                App generates visual representation of the Mandelbrot Set. It uses escape time algorithm to generate value for each pixel. It's implemented in vanilla Javascript and uses WebWorkers for multithreading. If rendering images takes very long time consider lowering the resolution of the window or number of iterations (can be changed with slider in the top right corner). Source code can be found on my <a href="https://github.com/irqize/mandelbrot">GitHub</a>. After zooming in a lot image may become pixelated as Javascript's floating point numbers' precision may be not enough to perform exact calculations anymore. Have fun!
-            </p>
-            <h3>Controls</h3>
-            <p>
-                Scroll to zoom in and out.
-                Drag the screen to move horizontally and vertically.
-            </p>
-        <button onclick="document.getElementById('welcomeMessageBackground').remove();">
-                Start
-            </button>
-        </div>
-    </div>
-    <div id="loadingScreenBackground">
-        <div>
-            Rendering...
-        </div>
-    </div>
-    
-    
-</body>
-</html>
+        }</style></head><body><a href="https://github.com/irqize/mandelbrot"><div id="github-link"><img src="https://raw.githubusercontent.com/rdimascio/icons/master/icons/github.svg"/></div></a><div id="welcomeMessageBackground"><div><h2>Mandelbrot Set Visualisation</h2><p>App generates visual representation of the Mandelbrot Set. It uses escape time algorithm to generate value for each pixel. It's implemented in vanilla Javascript and uses WebWorkers for multithreading. If rendering images takes very long time consider lowering the resolution of the window or number of iterations (can be changed with slider in the top right corner). Source code can be found on my <a href="https://github.com/irqize/mandelbrot">GitHub</a>. After zooming in a lot image may become pixelated as Javascript's floating point numbers' precision may be not enough to perform exact calculations anymore. Have fun!</p><h3>Controls</h3><p>Scroll to zoom in and out. Drag the screen to move horizontally and vertically.</p><button onclick="document.getElementById('welcomeMessageBackground').remove();">Start</button></div></div><div id="loadingScreenBackground"><div>Rendering...</div></div><script src="bundle.js"></script></body></html>
